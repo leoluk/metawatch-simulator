@@ -1,6 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
+#   Copyright (c) 2012 Leopold Schabel
+#   This file is part of MetaWatch Simulator.
+#
+#   This software is free software: you can redistribute it and/or modify it
+#   under the terms of the GNU General Public License as published by the
+#   Free Software Foundation, either version 3 of the License, or (at your
+#   option) any later version.
+#
+
+"""This file contains the GUI protocol parser, which is """
 
 import sys, os
 import logging
@@ -20,6 +30,11 @@ from protocol import MetaProtocolParser
 
 
 class GUIMetaProtocolParser(MetaProtocolParser):
+    """This class has direct access to the main GUI and subclasses the
+    protocol parser. This is the 'glue code' between the protocol layer and
+    the GUI representation - this class takes the parsed values and updates
+    the GUI accordingly."""
+    
     def __init__(self, window):
         MetaProtocolParser.__init__(self)
         self.window = window
@@ -28,14 +43,19 @@ class GUIMetaProtocolParser(MetaProtocolParser):
         self.vibrate = threading.Event()
         
         if 0:
-            # Wing IDE hints
+            # Wing IDE type hints
             import metasimulator
             isinstance(self.window, metasimulator.MainFrame)
             
     def watch_reset(self):
-        """Called when internal watch state is reset"""
+        """Called when internal watch state is reset
+        and on initialization.
+        
+        Anything that represents a certain state
+        should be reset here (registers etc.)."""
         
         self.vibrate.clear()
+        self.button_mapping = {}
     
     def handle_setRTC(self, *args, **kwargs):
         date, hrs12, dayFirst = \
@@ -44,12 +64,14 @@ class GUIMetaProtocolParser(MetaProtocolParser):
         self.window.clock_offset = relativedelta(date, datetime.now())
         
         if hrs12 != NotImplemented:
+            # Inofficial protocol extension, see protocol parser
             self.window.m_pg.SetPropertyValue('nval_2009', int(not hrs12))
             self.window.m_pg.SetPropertyValue('nval_200A', int(dayFirst))
         
         self.logger.info("RTC time set (offset %d secs)",
                          self.window.clock_offset.seconds)
         
+        # Update live clock
         self.window.OnClock()
         
     def handle_setLED(self, *args, **kwargs):
@@ -63,6 +85,12 @@ class GUIMetaProtocolParser(MetaProtocolParser):
         self.logger.info("Changed LED state to %d", state)
         
     def _vibrateTimer(self, cycles_left, on_time, off_time, state):
+        """Recursive timer. The vibration, which usually consists of multiple
+        cycles, is handled using GUI events, i.e. timers.
+        
+        The timer sets itself until there are no more cycles left. It can
+        be interrupted by clearing the vibrate flag."""
+        
         if not self.vibrate.is_set():
             return  # cancelled
         

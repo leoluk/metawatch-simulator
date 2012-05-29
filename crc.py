@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-#  Taken from pyMetaWatch
+#  Code from pyMetaWatch
 #
 
 class CRC_CCITT:

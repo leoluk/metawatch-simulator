@@ -1383,7 +1383,7 @@
                                             <property name="flag">wxEXPAND</property>
                                             <property name="proportion">1</property>
                                             <object class="spacer" expanded="1">
-                                                <property name="height">20</property>
+                                                <property name="height">23</property>
                                                 <property name="permission">protected</property>
                                                 <property name="width">0</property>
                                             </object>

@@ -1,11 +1,24 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
+#   Copyright (c) 2012 Leopold Schabel
+#   This file is part of MetaWatch Simulator.
+#
+#   This software is free software: you can redistribute it and/or modify it
+#   under the terms of the GNU General Public License as published by the
+#   Free Software Foundation, either version 3 of the License, or (at your
+#   option) any later version.
+#
+
+"""This module provides helper function which interfaces between the 'raw'
+NVAL list in protocol_constants and the GUI routine which populates the
+PropertyGrid. """
 
 from collections import namedtuple
 import wx.propgrid as wxpg
 
-### This file is kind of a mess. There is surely a much nicer way to implement this.
+# The current implementation somewhat messy, but works flawlessly.
+# There is surely a much nicer way to implement this.
 
 from protocol_constants import NVAL_VALUES
 

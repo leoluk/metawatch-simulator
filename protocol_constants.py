@@ -1,8 +1,20 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-#  See MetaWatchRemoteMessageProtocolV1.0.pdf
+#   Copyright (c) 2012 Leopold Schabel
+#   This file is part of MetaWatch Simulator.
 #
+#   This software is free software: you can redistribute it and/or modify it
+#   under the terms of the GNU General Public License as published by the
+#   Free Software Foundation, either version 3 of the License, or (at your
+#   option) any later version.
+#
+#   Constants extracted from MetaWatchRemoteMessageProtocolV1.0.pdf.
+#
+
+"""This file contains all constants mentioned in the protocol specification.
+Everything that looks like a big list should probably be declared here, not
+in the protocols module itself."""
 
 from collections import defaultdict
 

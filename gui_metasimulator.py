@@ -124,7 +124,7 @@ class MainFrame ( wx.Frame ):
 		bSizer11.Add( self.m_vibrateNotice, 0, wx.ALL|wx.EXPAND, 5 )
 		
 		
-		bSizer11.AddSpacer( ( 0, 20), 1, wx.EXPAND, 5 )
+		bSizer11.AddSpacer( ( 0, 23), 1, wx.EXPAND, 5 )
 		
 		
 		bScreenSizer.Add( bSizer11, 0, wx.EXPAND, 5 )
