@@ -148,6 +148,10 @@ class MetaProtocolParser(BaseProtocolParser):
         cycles = payload[5]
         
         return action, on_time, off_time, cycles
+    
+    def handle_disableButton(self, msgtype, option_bits, payload):
+        mode, index, press_type = payload
+        return mode, index, press_type
         
 def unpack(bytestr, mode='<h'):
     """Unpacks the binary representation of an unsigned short."""

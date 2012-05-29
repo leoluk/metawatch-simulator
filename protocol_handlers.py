@@ -55,7 +55,7 @@ class GUIMetaProtocolParser(MetaProtocolParser):
         should be reset here (registers etc.)."""
         
         self.vibrate.clear()
-        self.button_mapping = {}
+        self.button_mapping = []
     
     def handle_setRTC(self, *args, **kwargs):
         date, hrs12, dayFirst = \
@@ -122,5 +122,12 @@ class GUIMetaProtocolParser(MetaProtocolParser):
             self.vibrate.clear()
         
         
-        
-    
+    def handle_disableButton(self, *args, **kwargs):
+            button_config = MetaProtocolParser.handle_disableButton(self, *args, **kwargs)
+            
+            if button_config in self.button_mapping:
+                self.button_mapping.remove(button_config)
+                self.logger.info("Button mapping %r removed", [button_config])
+            else:
+                self.logger.debug("Button mapping %r does not exist", [button_config])
+                      
