@@ -31,6 +31,11 @@ class GUIMetaProtocolParser(MetaProtocolParser):
             # Wing IDE hints
             import metasimulator
             isinstance(self.window, metasimulator.MainFrame)
+            
+    def watch_reset(self):
+        """Called when internal watch state is reset"""
+        
+        self.vibrate.clear()
     
     def handle_setRTC(self, *args, **kwargs):
         date, hrs12, dayFirst = \

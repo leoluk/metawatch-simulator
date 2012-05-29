@@ -81,12 +81,18 @@ class MainFrame(gui_metasimulator.MainFrame, serialcore.SerialMixin):
         self.m_resetWatchOnButtonClick(None)
         self.m_openConnectionOnButtonClick()
         
-    def _buildPG(self):
+    def _reset_watch(self):
+        """Resets or initializes the internal GUI representation
+        of the MetaWatch to default values.
+        Called on startup during initialization."""
+        
         self.m_pg.ClearPage(0)  
         self.m_pg.Append(wxpg.PropertyCategory("NVAL Store"))
         
         self.m_LEDNotice.Hide()
         self.m_vibrateNotice.Hide()
+        
+        self.parser.watch_reset()
         
         # Filling in the PropertyGrid this way is somewhat, um, ugly.
         # TODO: use function prototypes instead
@@ -115,13 +121,15 @@ class MainFrame(gui_metasimulator.MainFrame, serialcore.SerialMixin):
         self.m_pg.SetPropertyAttribute("Date", wxpg.PG_DATE_PICKER_STYLE,
                                          wx.DP_DROPDOWN|wx.DP_SHOWCENTURY)
         self.OnClock(0)
+        
+        self.logger.info("Initialized watch to default state")
 
     def m_resetWatchOnButtonClick(self, event):
         self.m_watchMode.Selection = 0
         self.m_watchMode.Enabled = False
         self.m_manualModeSet.Value = False
         self.clock_offset = relativedelta(0)
-        self._buildPG()
+        self._reset_watch()
         
     def m_manualModeSetOnCheckBox(self, event):
         self.m_watchMode.Enabled = event.Checked()
