@@ -81,6 +81,10 @@ MESSAGE_TYPES_DICT = {
     0x58: 'readLightSense',
     0x59: 'readLightSenseResponse',
     
+    # Undocumented commands
+    
+    0xC0: 'setLED',
+    
 }
 
 MESSAGE_TYPES = defaultdict(lambda: 'undocumentedCode')

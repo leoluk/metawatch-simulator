@@ -17,7 +17,7 @@ import wx.xrc
 class MainFrame ( wx.Frame ):
 	
 	def __init__( self, parent ):
-		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"MetaWatch Remote Protocol Simulator 0.1", pos = wx.DefaultPosition, size = wx.Size( 812,463 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
+		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"MetaWatch Remote Protocol Simulator 0.1", pos = wx.DefaultPosition, size = wx.Size( 841,463 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
 		
 		self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
 		self.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BACKGROUND ) )
@@ -124,7 +124,10 @@ class MainFrame ( wx.Frame ):
 		bSizer11.Add( self.m_vibrateNotice, 0, wx.ALL|wx.EXPAND, 5 )
 		
 		
-		bScreenSizer.Add( bSizer11, 1, wx.EXPAND, 5 )
+		bSizer11.AddSpacer( ( 0, 20), 1, wx.EXPAND, 5 )
+		
+		
+		bScreenSizer.Add( bSizer11, 0, wx.EXPAND, 5 )
 		
 		
 		bSizer12.Add( bScreenSizer, 0, wx.EXPAND|wx.TOP|wx.RIGHT|wx.LEFT, 5 )

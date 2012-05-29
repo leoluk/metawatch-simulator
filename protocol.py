@@ -58,10 +58,10 @@ class BaseProtocolParser(object):
         
 class MetaProtocolParser(BaseProtocolParser):
     def handle_setRTC(self, msgtype, option_bits, payload):
-        year = struct.unpack('>h', str(payload[:2]))[0]
+        year = unpack(payload[:2], mode='>h')
         
-        month = payload[3]
-        day = payload[4]
+        month = payload[4]
+        day = payload[3]
         week_day = payload[5]
         
         hour = payload[5]
@@ -71,14 +71,28 @@ class MetaProtocolParser(BaseProtocolParser):
         if len(payload) > 8:
             hrs12 = bool(payload[8])     # undocumented - 12/24 hrs
             dayFirst = bool(payload[9])  # undocumented - DD-MM / MM-DD
+        else:
+            hrs12 = NotImplemented
+            dayFirst = NotImplemented
         
         return datetime.datetime(
             year=year, day=day, month=month,
             hour=hour, minute=minute, second=second, 
         ), hrs12, dayFirst
+    
+    def handle_setLED(self, msgtype, option_bits, payload):
+        return bool(option_bits)
         
+    def handle_setVibrate(self, msgtype, option_bits, payload):
+        action = payload[0]
+        on_time = unpack(payload[1:3])
+        off_time = unpack(payload[3:5])
+        cycles = payload[5]
         
+        return action, on_time, off_time, cycles
         
+def unpack(bytestr, mode='<h'):
+    return struct.unpack(mode, str(bytestr))[0]
         
 def tc2ba(text_chain):
     return bytearray(int(x, 16) for x in text_chain.split())

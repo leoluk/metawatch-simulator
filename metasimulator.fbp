@@ -42,7 +42,7 @@
             <property name="minimum_size"></property>
             <property name="name">MainFrame</property>
             <property name="pos"></property>
-            <property name="size">812,463</property>
+            <property name="size">841,463</property>
             <property name="style">wxDEFAULT_FRAME_STYLE</property>
             <property name="subclass"></property>
             <property name="title">MetaWatch Remote Protocol Simulator 0.1</property>
@@ -1028,7 +1028,7 @@
                                 <object class="sizeritem" expanded="1">
                                     <property name="border">5</property>
                                     <property name="flag">wxEXPAND</property>
-                                    <property name="proportion">1</property>
+                                    <property name="proportion">0</property>
                                     <object class="wxBoxSizer" expanded="0">
                                         <property name="minimum_size"></property>
                                         <property name="name">bSizer11</property>
@@ -1376,6 +1376,16 @@
                                                 <event name="OnSetFocus"></event>
                                                 <event name="OnSize"></event>
                                                 <event name="OnUpdateUI"></event>
+                                            </object>
+                                        </object>
+                                        <object class="sizeritem" expanded="1">
+                                            <property name="border">5</property>
+                                            <property name="flag">wxEXPAND</property>
+                                            <property name="proportion">1</property>
+                                            <object class="spacer" expanded="1">
+                                                <property name="height">20</property>
+                                                <property name="permission">protected</property>
+                                                <property name="width">0</property>
                                             </object>
                                         </object>
                                     </object>
