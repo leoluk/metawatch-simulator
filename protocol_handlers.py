@@ -42,7 +42,9 @@ class GUIMetaProtocolParser(MetaProtocolParser):
             self.window.m_pg.SetPropertyValue('nval_2009', int(not hrs12))
             self.window.m_pg.SetPropertyValue('nval_200A', int(dayFirst))
         
-        self.logger.info("Time changed")
+        self.logger.info("RTC time set (offset %d secs)",
+                         self.window.clock_offset.seconds)
+        
         self.window.OnClock()
         
     def handle_setLED(self, *args, **kwargs):
@@ -53,7 +55,7 @@ class GUIMetaProtocolParser(MetaProtocolParser):
         else:
             self.window.m_LEDNotice.Hide()
             
-        self.logger.info("Changed LED state")
+        self.logger.info("Changed LED state to %d", state)
         
     def _vibrateTimer(self, cycles_left, on_time, off_time, state):
         if not self.vibrate.is_set():
@@ -78,6 +80,9 @@ class GUIMetaProtocolParser(MetaProtocolParser):
         
         if action:
             self.vibrate.set()
+            self.logger.info("Vibrate %d times for %d/%d msecs" %
+                             (cycles, on_time, off_time))
+            
             self._vibrateTimer(cycles+2, on_time, off_time, 1)
         else:
             self.window.m_vibrateNotice.Hide()
