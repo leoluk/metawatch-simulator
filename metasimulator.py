@@ -204,13 +204,12 @@ class MainFrame(gui_metasimulator.MainFrame, serialcore.SerialMixin):
             
             if result == wx.ID_OK:
                 try:
-                    self.serial.close()
-                    self.serial.open()
+                    self.m_openConnectionOnButtonClick()
                 except serial.SerialException, e:
                     self.logger.error("Serial port configuration failed: %s", e.message)
                 else:
-                    self.m_openConnectionOnButtonClick()
                     ok = True
+                    
             elif result == wx.ID_CANCEL:
                 ok = True
                 
