@@ -58,7 +58,7 @@ class MainFrame(gui_metasimulator.MainFrame, serialcore.SerialMixin):
                 elif "[DEBUG]" in bytes:
                     color = "gray"
                 elif "[WARNING]" in bytes:
-                    color = "orange"
+                    color = "blue"
                 else:
                     color = "black"
                     
@@ -84,6 +84,9 @@ class MainFrame(gui_metasimulator.MainFrame, serialcore.SerialMixin):
     def _buildPG(self):
         self.m_pg.ClearPage(0)  
         self.m_pg.Append(wxpg.PropertyCategory("NVAL Store"))
+        
+        self.m_LEDNotice.Hide()
+        self.m_vibrateNotice.Hide()
         
         # Filling in the PropertyGrid this way is somewhat, um, ugly.
         # TODO: use function prototypes instead

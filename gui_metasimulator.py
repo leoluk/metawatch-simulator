@@ -17,7 +17,7 @@ import wx.xrc
 class MainFrame ( wx.Frame ):
 	
 	def __init__( self, parent ):
-		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"MetaWatch Remote Protocol Simulator 0.1", pos = wx.DefaultPosition, size = wx.Size( 872,499 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
+		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"MetaWatch Remote Protocol Simulator 0.1", pos = wx.DefaultPosition, size = wx.Size( 812,463 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
 		
 		self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
 		self.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BACKGROUND ) )
@@ -107,6 +107,22 @@ class MainFrame ( wx.Frame ):
 		self.m_manualModeSet = wx.CheckBox( self, wx.ID_ANY, u"Manual mode", wx.DefaultPosition, wx.DefaultSize, 0 )
 		bSizer11.Add( self.m_manualModeSet, 0, wx.ALL, 5 )
 		
+		self.m_LEDNotice = wx.StaticText( self, wx.ID_ANY, u"LED", wx.DefaultPosition, wx.DefaultSize, wx.ALIGN_CENTRE )
+		self.m_LEDNotice.Wrap( -1 )
+		self.m_LEDNotice.SetFont( wx.Font( 11, 74, 90, 92, False, "Tahoma" ) )
+		self.m_LEDNotice.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BACKGROUND ) )
+		self.m_LEDNotice.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_SCROLLBAR ) )
+		
+		bSizer11.Add( self.m_LEDNotice, 0, wx.ALL|wx.EXPAND, 5 )
+		
+		self.m_vibrateNotice = wx.StaticText( self, wx.ID_ANY, u"Vibrate", wx.DefaultPosition, wx.DefaultSize, wx.ALIGN_CENTRE|wx.ALIGN_LEFT )
+		self.m_vibrateNotice.Wrap( -1 )
+		self.m_vibrateNotice.SetFont( wx.Font( 11, 74, 90, 92, False, "Tahoma" ) )
+		self.m_vibrateNotice.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BACKGROUND ) )
+		self.m_vibrateNotice.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_SCROLLBAR ) )
+		
+		bSizer11.Add( self.m_vibrateNotice, 0, wx.ALL|wx.EXPAND, 5 )
+		
 		
 		bScreenSizer.Add( bSizer11, 1, wx.EXPAND, 5 )
 		
@@ -121,7 +137,7 @@ class MainFrame ( wx.Frame ):
 		self.m_staticText5.Wrap( -1 )
 		fgSizer2.Add( self.m_staticText5, 0, wx.ALIGN_CENTER|wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
-		self.m_comPort = wx.TextCtrl( self, wx.ID_ANY, u"\\\\.\\CNCB0", wx.DefaultPosition, wx.DefaultSize, wx.TE_READONLY )
+		self.m_comPort = wx.TextCtrl( self, wx.ID_ANY, u"COM8", wx.DefaultPosition, wx.DefaultSize, wx.TE_READONLY )
 		fgSizer2.Add( self.m_comPort, 0, wx.ALL, 5 )
 		
 		self.m_serialSetup = wx.Button( self, wx.ID_ANY, u"Setup...", wx.DefaultPosition, wx.DefaultSize, 0 )
