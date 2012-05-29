@@ -123,6 +123,11 @@ class MainFrame(gui_metasimulator.MainFrame, serialcore.SerialMixin):
         self.m_resetWatchOnButtonClick(None)
         self.m_openConnectionOnButtonClick()
         
+        if len(sys.argv) > 1:
+            if sys.argv[1] == '--debug':
+                self.m_debug.Value = True
+                logging.root.setLevel(logging.DEBUG)
+        
     def _reset_watch(self):
         """Resets or initializes the internal GUI representation of the
         MetaWatch to default values. Called on startup during
