@@ -127,7 +127,7 @@ class GUIMetaProtocolParser(MetaProtocolParser):
         if state:
             self.window.m_LEDNotice.Show()
             # Hardcoded, what does a real watch do?
-            wx.CallLater(2000, self.window.m_LEDNotice.Hide)
+            wx.CallLater(10000, self.window.m_LEDNotice.Hide)
         else:
             self.window.m_LEDNotice.Hide()
             
@@ -214,11 +214,10 @@ class GUIMetaProtocolParser(MetaProtocolParser):
         for i, line1 in enumerate(lines):
             for n, byte in enumerate(line1.unpack(zero='\xff', one='\x00')):
                 self.display_buffers[mode][index[i]][n] = ord(byte)
-                self.refresh_bitmap(mode)
 
         # This will refresh the current view 'live' as data arrives,
         # not sure if the real watch does this as well.
         
-        if mode == self.active_buffer:
+        if (mode == self.active_buffer) and self.window.m_liveView.Value:
             self.refresh_bitmap(mode)
                       
