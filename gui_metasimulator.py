@@ -54,7 +54,7 @@ class MainFrame ( wx.Frame ):
 		self.m_display = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.DOUBLE_BORDER|wx.TAB_TRAVERSAL )
 		self.m_display.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_WINDOW ) )
 		self.m_display.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_WINDOW ) )
-		self.m_display.SetMinSize( wx.Size( 96,96 ) )
+		self.m_display.SetMinSize( wx.Size( 100,100 ) )
 		
 		bSizer3.Add( self.m_display, 0, wx.ALL, 5 )
 		

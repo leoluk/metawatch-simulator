@@ -430,7 +430,7 @@
                                                 <property name="maximum_size"></property>
                                                 <property name="min_size"></property>
                                                 <property name="minimize_button">0</property>
-                                                <property name="minimum_size">96,96</property>
+                                                <property name="minimum_size">100,100</property>
                                                 <property name="moveable">1</property>
                                                 <property name="name">m_display</property>
                                                 <property name="pane_border">1</property>

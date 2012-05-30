@@ -42,6 +42,7 @@ class GUIMetaProtocolParser(MetaProtocolParser):
         self.logger = logging.getLogger('parser')
         
         self.vibrate = threading.Event()
+        self.active_timeout = None
         
         if 0:
             # Wing IDE type hints
@@ -81,6 +82,9 @@ class GUIMetaProtocolParser(MetaProtocolParser):
         
         for buffer in self.display_buffers:
             buffer[:,:,] = 255
+            
+        if self.active_timeout:
+            self.active_timeout.Stop()
         
         self.refresh_bitmap()
         
@@ -107,8 +111,8 @@ class GUIMetaProtocolParser(MetaProtocolParser):
         
         if hrs12 != NotImplemented:
             # Inofficial protocol extension, see protocol parser
-            self.window.m_pg.SetPropertyValue('nval_2009', int(not hrs12))
-            self.window.m_pg.SetPropertyValue('nval_200A', int(dayFirst))
+            self.window.nval_store['nval_2009'] = int(not hrs12)
+            self.window.nval_store['nval_200A'] = int(dayFirst)
         
         self.logger.info("RTC time set (offset %d secs)",
                          self.window.clock_offset.seconds)
@@ -172,4 +176,45 @@ class GUIMetaProtocolParser(MetaProtocolParser):
                 self.logger.info("Button mapping %r removed", [button_config])
             else:
                 self.logger.debug("Button mapping %r does not exist", [button_config])
+                
+    def _reset_mode(self, last=0):
+        self.active_buffer = last
+        self.logger.info("Active buffer set to [%d] %s", last, 
+                             self.window.m_watchMode.GetItemLabel(last))
+
+                
+    def handle_updateLCD(self, *args, **kwargs):
+            mode = MetaProtocolParser.handle_updateLCD(self, *args, **kwargs)
+            
+            self.logger.info("Active buffer set to [%d] %s", mode, 
+                             self.window.m_watchMode.GetItemLabel(mode))
+
+            if mode > 0:
+                timeout = 'nval_0005' if mode == 1 else 'nval_0006'
+                if self.active_timeout:
+                    self.active_timeout.Stop()
+                self.active_timeout = wx.CallLater(self.window.nval_store[timeout]*1000,
+                                                   self._reset_mode,
+                                                   self.active_buffer if mode == 2 else 0)
+                
+                # TODO: interaction between timer and 'Manual mode' checkbox
+            
+            self.active_buffer = mode
+            
+    def handle_writeLCD(self, *args, **kwargs):
+        mode, two_lines, line1, line2, index = \
+            MetaProtocolParser.handle_writeLCD(self, *args, **kwargs)
+        
+        lines = (line1, line2) if two_lines else (line1, )
+        
+        for i, line1 in enumerate(lines):
+            for n, byte in enumerate(line1.unpack(zero='\x00', one='\xff')):
+                self.display_buffers[mode][index[i]][n] = ord(byte)
+            
+        # TODO: pass entire row to numpy
+
+        # This will refresh the current view 'live' as data arrives
+        
+        if mode == self.active_buffer:
+            self.refresh_bitmap(mode)
                       

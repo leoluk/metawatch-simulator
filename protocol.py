@@ -23,6 +23,7 @@ import struct
 import datetime
 
 import crc
+import bitarray
 
 from protocol_constants import MESSAGE_TYPES
 
@@ -77,7 +78,8 @@ class BaseProtocolParser(object):
         # Different parts of the message:
         
         msgtype = message[2]
-        option_bits = message[3]
+        option_bits = bitarray.bitarray(endian='little')
+        option_bits.fromstring(chr(message[3]))
         payload = message[4:-2]
         checksum = message[-2:]
         
@@ -139,7 +141,7 @@ class MetaProtocolParser(BaseProtocolParser):
         ), hrs12, dayFirst
     
     def handle_setLED(self, msgtype, option_bits, payload):
-        return bool(option_bits)
+        return option_bits[0]
         
     def handle_setVibrate(self, msgtype, option_bits, payload):
         action = payload[0]
@@ -152,6 +154,32 @@ class MetaProtocolParser(BaseProtocolParser):
     def handle_disableButton(self, msgtype, option_bits, payload):
         mode, index, press_type = payload
         return mode, index, press_type
+    
+    def handle_writeLCD(self, msgtype, option_bits, payload):
+        mode = ord(option_bits[0:3].tobytes())
+        two_lines = (not option_bits[4]) and (len(payload) > 13)
+        
+        # At the moment, there are some hard-coded checks
+        # for two_lines. This introduces some redundant code.
+        
+        line1 = bitarray.bitarray(endian='little')
+        line2 = bitarray.bitarray(endian='little')
+        
+        line1.frombytes(str(payload[1:13]))
+        
+        if two_lines:
+            line2.frombytes(str(payload[14:26]))
+            
+        if two_lines:
+            index = payload[0], payload[13]
+        else:
+            index = (payload[0], )
+        
+        return mode, two_lines, line1, line2, index
+    
+    def handle_updateLCD(self, msgtype, option_bits, payload):
+        # TODO: implement undocumented 'activate' flag
+        return ord(option_bits[0:3].tobytes())
         
 def unpack(bytestr, mode='<h'):
     """Unpacks the binary representation of an unsigned short."""
