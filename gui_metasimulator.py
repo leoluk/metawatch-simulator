@@ -29,6 +29,38 @@ class MainFrame ( wx.Frame ):
 		
 		bScreenSizer = wx.BoxSizer( wx.HORIZONTAL )
 		
+		bSizer5 = wx.BoxSizer( wx.VERTICAL )
+		
+		self.m_SideF = wx.Button( self, wx.ID_ANY, u"F", wx.DefaultPosition, wx.DefaultSize, wx.BU_EXACTFIT )
+		self.m_SideF.SetMinSize( wx.Size( 27,-1 ) )
+		
+		bSizer5.Add( self.m_SideF, 0, wx.ALL, 5 )
+		
+		self.m_SideE = wx.Button( self, wx.ID_ANY, u"E", wx.DefaultPosition, wx.DefaultSize, wx.BU_EXACTFIT )
+		self.m_SideE.SetMinSize( wx.Size( 27,-1 ) )
+		
+		bSizer5.Add( self.m_SideE, 0, wx.ALL, 5 )
+		
+		self.m_SideD = wx.Button( self, wx.ID_ANY, u"D", wx.DefaultPosition, wx.DefaultSize, wx.BU_EXACTFIT )
+		self.m_SideD.SetMinSize( wx.Size( 27,-1 ) )
+		
+		bSizer5.Add( self.m_SideD, 0, wx.ALL, 5 )
+		
+		
+		bScreenSizer.Add( bSizer5, 0, 0, 5 )
+		
+		bSizer3 = wx.BoxSizer( wx.VERTICAL )
+		
+		self.m_display = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.DOUBLE_BORDER|wx.TAB_TRAVERSAL )
+		self.m_display.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_WINDOW ) )
+		self.m_display.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_WINDOW ) )
+		self.m_display.SetMinSize( wx.Size( 96,96 ) )
+		
+		bSizer3.Add( self.m_display, 0, wx.ALL, 5 )
+		
+		
+		bScreenSizer.Add( bSizer3, 0, 0, 5 )
+		
 		bSizer2 = wx.BoxSizer( wx.VERTICAL )
 		
 		self.m_SideA = wx.Button( self, wx.ID_ANY, u"A", wx.DefaultPosition, wx.DefaultSize, wx.BU_EXACTFIT )
@@ -48,38 +80,6 @@ class MainFrame ( wx.Frame ):
 		
 		
 		bScreenSizer.Add( bSizer2, 0, 0, 5 )
-		
-		bSizer3 = wx.BoxSizer( wx.VERTICAL )
-		
-		self.m_panel1 = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.DOUBLE_BORDER|wx.TAB_TRAVERSAL )
-		self.m_panel1.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_WINDOW ) )
-		self.m_panel1.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_WINDOW ) )
-		self.m_panel1.SetMinSize( wx.Size( 96,96 ) )
-		
-		bSizer3.Add( self.m_panel1, 0, wx.ALL, 5 )
-		
-		
-		bScreenSizer.Add( bSizer3, 0, 0, 5 )
-		
-		bSizer5 = wx.BoxSizer( wx.VERTICAL )
-		
-		self.m_SideD = wx.Button( self, wx.ID_ANY, u"D", wx.DefaultPosition, wx.DefaultSize, wx.BU_EXACTFIT )
-		self.m_SideD.SetMinSize( wx.Size( 27,-1 ) )
-		
-		bSizer5.Add( self.m_SideD, 0, wx.ALL, 5 )
-		
-		self.m_SideE = wx.Button( self, wx.ID_ANY, u"E", wx.DefaultPosition, wx.DefaultSize, wx.BU_EXACTFIT )
-		self.m_SideE.SetMinSize( wx.Size( 27,-1 ) )
-		
-		bSizer5.Add( self.m_SideE, 0, wx.ALL, 5 )
-		
-		self.m_SideF = wx.Button( self, wx.ID_ANY, u"F", wx.DefaultPosition, wx.DefaultSize, wx.BU_EXACTFIT )
-		self.m_SideF.SetMinSize( wx.Size( 27,-1 ) )
-		
-		bSizer5.Add( self.m_SideF, 0, wx.ALL, 5 )
-		
-		
-		bScreenSizer.Add( bSizer5, 0, 0, 5 )
 		
 		bSizer10 = wx.BoxSizer( wx.VERTICAL )
 		
@@ -107,14 +107,6 @@ class MainFrame ( wx.Frame ):
 		self.m_manualModeSet = wx.CheckBox( self, wx.ID_ANY, u"Manual mode", wx.DefaultPosition, wx.DefaultSize, 0 )
 		bSizer11.Add( self.m_manualModeSet, 0, wx.ALL, 5 )
 		
-		self.m_LEDNotice = wx.StaticText( self, wx.ID_ANY, u"LED", wx.DefaultPosition, wx.DefaultSize, wx.ALIGN_CENTRE )
-		self.m_LEDNotice.Wrap( -1 )
-		self.m_LEDNotice.SetFont( wx.Font( 11, 74, 90, 92, False, "Tahoma" ) )
-		self.m_LEDNotice.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BACKGROUND ) )
-		self.m_LEDNotice.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_SCROLLBAR ) )
-		
-		bSizer11.Add( self.m_LEDNotice, 0, wx.ALL|wx.EXPAND, 5 )
-		
 		self.m_vibrateNotice = wx.StaticText( self, wx.ID_ANY, u"Vibrate", wx.DefaultPosition, wx.DefaultSize, wx.ALIGN_CENTRE|wx.ALIGN_LEFT )
 		self.m_vibrateNotice.Wrap( -1 )
 		self.m_vibrateNotice.SetFont( wx.Font( 11, 74, 90, 92, False, "Tahoma" ) )
@@ -122,6 +114,14 @@ class MainFrame ( wx.Frame ):
 		self.m_vibrateNotice.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_SCROLLBAR ) )
 		
 		bSizer11.Add( self.m_vibrateNotice, 0, wx.ALL|wx.EXPAND, 5 )
+		
+		self.m_LEDNotice = wx.StaticText( self, wx.ID_ANY, u"LED", wx.DefaultPosition, wx.DefaultSize, wx.ALIGN_CENTRE )
+		self.m_LEDNotice.Wrap( -1 )
+		self.m_LEDNotice.SetFont( wx.Font( 11, 74, 90, 92, False, "Tahoma" ) )
+		self.m_LEDNotice.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BACKGROUND ) )
+		self.m_LEDNotice.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_SCROLLBAR ) )
+		
+		bSizer11.Add( self.m_LEDNotice, 0, wx.ALL|wx.EXPAND, 5 )
 		
 		
 		bSizer11.AddSpacer( ( 0, 23), 1, wx.EXPAND, 5 )
@@ -190,12 +190,13 @@ class MainFrame ( wx.Frame ):
 		
 		# Connect Events
 		self.Bind( wx.EVT_CLOSE, self.MainFrameOnClose )
+		self.m_SideF.Bind( wx.EVT_BUTTON, self.m_OnSideButtonClick )
+		self.m_SideE.Bind( wx.EVT_BUTTON, self.m_OnSideButtonClick )
+		self.m_SideD.Bind( wx.EVT_BUTTON, self.m_OnSideButtonClick )
+		self.m_display.Bind( wx.EVT_PAINT, self.OnDisplayPaint )
 		self.m_SideA.Bind( wx.EVT_BUTTON, self.m_OnSideButtonClick )
 		self.m_SideB.Bind( wx.EVT_BUTTON, self.m_OnSideButtonClick )
 		self.m_SideC.Bind( wx.EVT_BUTTON, self.m_OnSideButtonClick )
-		self.m_SideD.Bind( wx.EVT_BUTTON, self.m_OnSideButtonClick )
-		self.m_SideE.Bind( wx.EVT_BUTTON, self.m_OnSideButtonClick )
-		self.m_SideF.Bind( wx.EVT_BUTTON, self.m_OnSideButtonClick )
 		self.m_resetWatch.Bind( wx.EVT_BUTTON, self.m_resetWatchOnButtonClick )
 		self.m_manualModeSet.Bind( wx.EVT_CHECKBOX, self.m_manualModeSetOnCheckBox )
 		self.m_serialSetup.Bind( wx.EVT_BUTTON, self.m_serialSetupOnButtonClick )
@@ -215,6 +216,9 @@ class MainFrame ( wx.Frame ):
 		event.Skip()
 	
 	
+	
+	def OnDisplayPaint( self, event ):
+		event.Skip()
 	
 	
 	
