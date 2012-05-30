@@ -22,6 +22,7 @@ from dateutil.relativedelta import relativedelta
 
 import wx
 import wx.propgrid as wxpr
+import numpy
 
 import protocol_constants
 import protocol
@@ -47,6 +48,19 @@ class GUIMetaProtocolParser(MetaProtocolParser):
             import metasimulator
             isinstance(self.window, metasimulator.MainFrame)
             
+    @property
+    def active_buffer(self):
+        return self.window.m_watchMode.Selection
+    
+    @active_buffer.setter
+    def active_buffer(self, value):
+        self.window.m_watchMode.Selection = value
+        self.refresh_bitmap(value)
+        
+    @property
+    def display_buffer(self):
+        return self.display_buffers[self.active_buffer]
+            
     def watch_reset(self):
         """Called when internal watch state is reset
         and on initialization.
@@ -56,7 +70,35 @@ class GUIMetaProtocolParser(MetaProtocolParser):
         
         self.vibrate.clear()
         self.button_mapping = []
-    
+        
+        self.display_buffers = (
+            numpy.zeros( (96, 96, 3),'uint8'),  # Idle
+            numpy.zeros( (96, 96, 3),'uint8'),  # Application
+            numpy.zeros( (96, 96, 3),'uint8'),   # Notification
+        )
+        
+        self.active_buffer = 0
+        
+        for buffer in self.display_buffers:
+            buffer[:,:,] = 255
+        
+        self.refresh_bitmap()
+        
+    def refresh_bitmap(self, buffer_id=None):
+        if not buffer_id:
+            buffer_id = self.active_buffer
+            
+        image = wx.EmptyImage(96, 96)
+        image.SetData(self.display_buffer.tostring())
+        
+        self.bitmap = wx.BitmapFromImage(image)
+        
+        self.window.m_display.Refresh()
+        
+    def draw_bitmap(self, dc):
+        dc.Clear()
+        dc.DrawBitmap(self.bitmap, 0, 0, True)
+        
     def handle_setRTC(self, *args, **kwargs):
         date, hrs12, dayFirst = \
             MetaProtocolParser.handle_setRTC(self, *args, **kwargs)

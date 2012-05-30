@@ -198,6 +198,7 @@ class MainFrame ( wx.Frame ):
 		self.m_SideB.Bind( wx.EVT_BUTTON, self.m_OnSideButtonClick )
 		self.m_SideC.Bind( wx.EVT_BUTTON, self.m_OnSideButtonClick )
 		self.m_resetWatch.Bind( wx.EVT_BUTTON, self.m_resetWatchOnButtonClick )
+		self.m_watchMode.Bind( wx.EVT_RADIOBOX, self.m_watchModeOnRadioBox )
 		self.m_manualModeSet.Bind( wx.EVT_CHECKBOX, self.m_manualModeSetOnCheckBox )
 		self.m_serialSetup.Bind( wx.EVT_BUTTON, self.m_serialSetupOnButtonClick )
 		self.m_openConnection.Bind( wx.EVT_BUTTON, self.m_openConnectionOnButtonClick )
@@ -224,6 +225,9 @@ class MainFrame ( wx.Frame ):
 	
 	
 	def m_resetWatchOnButtonClick( self, event ):
+		event.Skip()
+	
+	def m_watchModeOnRadioBox( self, event ):
 		event.Skip()
 	
 	def m_manualModeSetOnCheckBox( self, event ):

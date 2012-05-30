@@ -294,7 +294,13 @@ class MainFrame(gui_metasimulator.MainFrame, serialcore.SerialMixin):
         clock = datetime.datetime.now() + self.clock_offset
         self.m_pg.GetProperty('Date').SetValue(clock)
         self.m_pg.GetProperty('Time').SetValue(clock.strftime("%H:%M:%S"))
-
+        
+    def OnDisplayPaint(self, event):
+        dc = wx.PaintDC(event.GetEventObject())    
+        self.parser.draw_bitmap(dc)
+        
+    def m_watchModeOnRadioBox(self, event):
+        self.parser.refresh_bitmap()
 
 class MetaSimApp(wx.App):
     def OnInit(self):
