@@ -58,6 +58,10 @@ class MainFrame ( wx.Frame ):
 		
 		bSizer3.Add( self.m_display, 0, wx.ALL, 5 )
 		
+		self.m_liveView = wx.CheckBox( self, wx.ID_ANY, u"Live updates", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_liveView.SetValue(True) 
+		bSizer3.Add( self.m_liveView, 0, wx.ALL, 5 )
+		
 		
 		bScreenSizer.Add( bSizer3, 0, 0, 5 )
 		
