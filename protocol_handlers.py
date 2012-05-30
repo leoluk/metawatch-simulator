@@ -97,7 +97,8 @@ class GUIMetaProtocolParser(MetaProtocolParser):
         
         self.bitmap = wx.BitmapFromImage(image)
         
-        self.window.m_display.Refresh()
+        if buffer_id == self.active_buffer:
+            self.window.m_display.Refresh()
         
     def draw_bitmap(self, dc):
         dc.Clear()
@@ -125,6 +126,8 @@ class GUIMetaProtocolParser(MetaProtocolParser):
         
         if state:
             self.window.m_LEDNotice.Show()
+            # Hardcoded, what does a real watch do?
+            wx.CallLater(2000, self.window.m_LEDNotice.Hide)
         else:
             self.window.m_LEDNotice.Hide()
             
@@ -179,10 +182,9 @@ class GUIMetaProtocolParser(MetaProtocolParser):
                 
     def _reset_mode(self, last=0):
         self.active_buffer = last
-        self.logger.info("Active buffer set to [%d] %s", last, 
+        self.window.logger.info("Buffer timeout, reset to [%d] %s", last, 
                              self.window.m_watchMode.GetItemLabel(last))
-
-                
+        
     def handle_updateLCD(self, *args, **kwargs):
             mode = MetaProtocolParser.handle_updateLCD(self, *args, **kwargs)
             
@@ -194,9 +196,9 @@ class GUIMetaProtocolParser(MetaProtocolParser):
                 if self.active_timeout:
                     self.active_timeout.Stop()
                 self.active_timeout = wx.CallLater(self.window.nval_store[timeout]*1000,
-                                                   self._reset_mode,
-                                                   self.active_buffer if mode == 2 else 0)
+                                                   self._reset_mode, 0)
                 
+                # TODO: correct buffer reset
                 # TODO: interaction between timer and 'Manual mode' checkbox
             
             self.active_buffer = mode
@@ -207,13 +209,15 @@ class GUIMetaProtocolParser(MetaProtocolParser):
         
         lines = (line1, line2) if two_lines else (line1, )
         
-        for i, line1 in enumerate(lines):
-            for n, byte in enumerate(line1.unpack(zero='\x00', one='\xff')):
-                self.display_buffers[mode][index[i]][n] = ord(byte)
-            
         # TODO: pass entire row to numpy
+        
+        for i, line1 in enumerate(lines):
+            for n, byte in enumerate(line1.unpack(zero='\xff', one='\x00')):
+                self.display_buffers[mode][index[i]][n] = ord(byte)
+                self.refresh_bitmap(mode)
 
-        # This will refresh the current view 'live' as data arrives
+        # This will refresh the current view 'live' as data arrives,
+        # not sure if the real watch does this as well.
         
         if mode == self.active_buffer:
             self.refresh_bitmap(mode)
