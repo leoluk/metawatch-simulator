@@ -106,6 +106,18 @@ class MainFrame(gui_metasimulator.MainFrame, serialcore.SerialMixin):
         streamhandler.formatter = logging.Formatter("[%(levelname)s] - %(name)s "
                                                     "-> %(message)s")
         logging.root.addHandler(streamhandler)
+        
+        # Shortcut for NVAL access
+        
+        class NVALAccess(object):
+            def __init__(self, pg):
+                self.pg = pg
+            def __getitem__(self, item):
+                return self.pg.GetPropertyValue(item)
+            def __setitem__(self, item, value):
+                return self.pg.SetPropertyValue(item, value)
+            
+        self.nval_store = NVALAccess(self.m_pg)        
 
         # The SerialMixin emits a signal every time it receives a chunk of bytes.
         self.Bind(serialcore.EVT_SERIALRX, self.OnSerialRX)
@@ -292,8 +304,8 @@ class MainFrame(gui_metasimulator.MainFrame, serialcore.SerialMixin):
         time, which is applied every time the PG is updated."""
         
         clock = datetime.datetime.now() + self.clock_offset
-        self.m_pg.GetProperty('Date').SetValue(clock)
-        self.m_pg.GetProperty('Time').SetValue(clock.strftime("%H:%M:%S"))
+        self.nval_store['Date'] = clock
+        self.nval_store['Time'] = clock.strftime("%H:%M:%S")
         
     def OnDisplayPaint(self, event):
         dc = wx.PaintDC(event.GetEventObject())    
