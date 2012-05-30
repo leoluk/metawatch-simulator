@@ -24,10 +24,10 @@ import wx
 import wx.propgrid as wxpr
 import numpy
 
-import protocol_constants
+import protocol_constants as const
 import protocol
 
-from protocol import MetaProtocolParser
+from protocol import MetaProtocolParser, MetaProtocolFactory
 
 
 class GUIMetaProtocolParser(MetaProtocolParser):
@@ -61,6 +61,10 @@ class GUIMetaProtocolParser(MetaProtocolParser):
     @property
     def display_buffer(self):
         return self.display_buffers[self.active_buffer]
+    
+    @display_buffer.setter
+    def display_buffer(self, value):
+        self.display_buffers[self.active_buffer] = value
             
     def watch_reset(self):
         """Called when internal watch state is reset
@@ -72,16 +76,20 @@ class GUIMetaProtocolParser(MetaProtocolParser):
         self.vibrate.clear()
         self.button_mapping = []
         
-        self.display_buffers = (
+        self.display_buffers = [
             numpy.zeros( (96, 96, 3),'uint8'),  # Idle
             numpy.zeros( (96, 96, 3),'uint8'),  # Application
             numpy.zeros( (96, 96, 3),'uint8'),   # Notification
-        )
+        ]
         
         self.active_buffer = 0
         
         for buffer in self.display_buffers:
             buffer[:,:,] = 255
+            
+        #template = wx.Image("template.bmp").GetData()
+        #self.display_buffer = numpy.fromstring(template,
+                            #dtype='uint8').reshape((96, 96, 3))
             
         if self.active_timeout:
             self.active_timeout.Stop()
@@ -202,7 +210,7 @@ class GUIMetaProtocolParser(MetaProtocolParser):
                 # TODO: interaction between timer and 'Manual mode' checkbox
             
             self.active_buffer = mode
-            
+    
     def handle_writeLCD(self, *args, **kwargs):
         mode, two_lines, line1, line2, index = \
             MetaProtocolParser.handle_writeLCD(self, *args, **kwargs)
@@ -220,4 +228,32 @@ class GUIMetaProtocolParser(MetaProtocolParser):
         
         if (mode == self.active_buffer) and self.window.m_liveView.Value:
             self.refresh_bitmap(mode)
+            
+    def handle_getDeviceType(self, *args, **kwargs):
+        self.window.factory.send_getDeviceTypeResponse(
+            const.DEVICE_TYPE_DIGITAL
+        )
+        self.logger.info("Responded to device type query: DEVICE_TYPE_DIGITAL")
+        
                       
+                      
+class GUIMetaProtocolFactory(MetaProtocolFactory):
+    def __init__(self, window):
+        MetaProtocolFactory.__init__(self)
+        self.window = window
+        self.logger = logging.getLogger('factory')
+        
+        if 0:
+            # Wing IDE type hints
+            import metasimulator
+            isinstance(self.window, metasimulator.MainFrame)        
+        
+    def _compose_message(self, option_bits=None, payload=None, msgtype=None):
+        message = MetaProtocolFactory._compose_message(self, option_bits,
+                                                         payload, msgtype)
+        
+        self.window.write_queue.put(message)
+        self.logger.debug("Sent data: %s", ' '.join(["%02X" %
+                                  byte for byte in message]))        
+        
+        

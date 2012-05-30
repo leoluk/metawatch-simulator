@@ -21,10 +21,12 @@ which is where all the GUI updates happen.
 import sys, os
 import struct
 import datetime
+import inspect
 
 import crc
-import bitarray
+from bitarray import bitarray
 
+import protocol_constants as const
 from protocol_constants import MESSAGE_TYPES
 
 class ProtocolError(Exception): pass
@@ -32,12 +34,12 @@ class InvalidMessage(ProtocolError): pass
 class InvalidChecksum(ProtocolError): pass
 
 class BaseProtocolParser(object):
+    """This class parses incoming watch messages, checks their integrity
+    and dissects them. All the message types are defined in the module
+    protocol_constants. Every message type has its own handler
+    function."""
+    
     def __init__(self):
-        """This class parses incoming watch messages, checks their integrity
-        and dissects them. All the message types are defined in the module
-        protocol_constants. Every message type has its own handler
-        function."""
-        
         self.crc_engine = crc.CRC_CCITT()
         
     def _not_implemented(self, msgtype, *args, **kwargs):
@@ -46,6 +48,12 @@ class BaseProtocolParser(object):
         
         raise NotImplementedError("Message type %s not implemented"
                                   % MESSAGE_TYPES[msgtype])
+    
+    def _checksum(self, message, clip=True):
+        if clip:
+            message = message[0:-2]
+        crc_ = self.crc_engine.checksum(str(message))
+        return bytearray(struct.pack('<H', crc_))        
         
     def parse(self, message):
         """Parses one or more watch messages, checks their integrity, splits\
@@ -78,17 +86,14 @@ class BaseProtocolParser(object):
         # Different parts of the message:
         
         msgtype = message[2]
-        option_bits = bitarray.bitarray(endian='little')
+        option_bits = bitarray(endian='little')
         option_bits.fromstring(chr(message[3]))
         payload = message[4:-2]
         checksum = message[-2:]
         
         # Verify the checksum:
         
-        crc_ = self.crc_engine.checksum(str(message[0:-2]))
-        checksum_ = bytearray(struct.pack('<H', crc_))
-        
-        if checksum != checksum_:
+        if checksum != self._checksum(message):
             raise ProtocolError("Invalid checksum")
         
         # Pass to handler function using some black magic:
@@ -97,6 +102,66 @@ class BaseProtocolParser(object):
                 self._not_implemented)(
             msgtype, option_bits, payload
         )
+        
+        
+class MetaProtocolFactory(BaseProtocolParser):
+    """This class is responsible for message generation.
+    It shares some processing code with the protocol parser (after all,
+    there is not THAT much difference in what they do)."""
+    
+    def _init_option_bits(self):
+        """Returns a correctly initialized bitarray."""
+        
+        array = bitarray(endian='little')
+        array.fromstring('\x00')
+        
+        return array
+    
+    def _compose_message(self, option_bits=None, payload=None, msgtype=None):
+        """Constructs a new message from its different parts,
+        ready to dispatch."""
+        
+        # Parameter sanity checking (very basic; after all, we're not
+        # dealing with user data like we do in the parser)
+        
+        if not option_bits:
+            option_bits = self._init_option_bits()
+            
+        assert option_bits.endian() == 'little'     
+            
+        if not payload:
+            payload = bytearray(0x00)
+            
+        if not msgtype:
+            caller = inspect.stack()[2][3]
+            if caller.startswith('send_'):
+                msgtype = caller[5:]
+            
+        if isinstance(msgtype, str):
+            msgtype = const.MESSAGE_TYPES_LOOKUP[msgtype]
+            
+        assert msgtype in MESSAGE_TYPES.keys(), "Invalid message type"       
+        
+        # Create a new message, including the start byte
+        message = bytearray()
+        message.append(1)
+        
+        # Calculate the length 
+        # (start + len + msgtype + op_bits + 2*crc = 6 bytes)
+        
+        message.append(len(payload)+6)
+        
+        message.append(msgtype)
+        message.append(ord(option_bits.tostring()))
+        message.extend(payload)
+        
+        message.extend(self._checksum(message, clip=False))
+        
+        return message
+    
+    def send_getDeviceTypeResponse(self, device_type):
+        payload = bytearray(device_type)
+        return self._compose_message(None, payload)
         
         
 class MetaProtocolParser(BaseProtocolParser):
@@ -162,8 +227,8 @@ class MetaProtocolParser(BaseProtocolParser):
         # At the moment, there are some hard-coded checks
         # for two_lines. This introduces some redundant code.
         
-        line1 = bitarray.bitarray(endian='little')
-        line2 = bitarray.bitarray(endian='little')
+        line1 = bitarray(endian='little')
+        line2 = bitarray(endian='little')
         
         line1.frombytes(str(payload[1:13]))
         
@@ -191,9 +256,17 @@ def tc2ba(text_chain):
         
 def main():
     parser = MetaProtocolParser()
+    factory = MetaProtocolFactory()
     
-    debug_chain = "01 10 26 00 03 F2 0C 05 02 04 2E 3C 01 01 FE 49"
-    print parser.parse(tc2ba(debug_chain))
+    #debug_chain = "01 10 26 00 03 F2 0C 05 02 04 2E 3C 01 01 FE 49"
+    #print parser.parse(tc2ba(debug_chain))
+    
+    message = factory.send_getDeviceTypeResponse(const.DEVICE_TYPE_DIGITAL)
+    
+    try:
+        print parser.parse(message)
+    except NotImplementedError:
+        pass
 
 
 if __name__ == '__main__':

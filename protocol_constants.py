@@ -99,6 +99,23 @@ MESSAGE_TYPES_DICT = {
     
 }
 
-MESSAGE_TYPES = defaultdict(lambda: 'undocumentedCode')
+MESSAGE_TYPES = defaultdict(lambda: '<undocumented>')
 
 MESSAGE_TYPES.update(MESSAGE_TYPES_DICT)
+MESSAGE_TYPES_LOOKUP = dict((v,k) for k, v in MESSAGE_TYPES.iteritems())
+
+# Actual constants
+
+DEVICE_TYPE_ANALOG = 1
+DEVICE_TYPE_DIGITAL = 2
+DEVICE_TYPE_DIGITAL_DEV = 3
+DEVICE_TYPE_ANALOG_DEV = 4
+
+MODE_IDLE = 0
+MODE_APP = 1
+MODE_NOTIFY = 2
+
+BUTTON_TYPE_IMMEDIATE = 0
+BUTTON_TYPE_PRESS = 1
+BUTTON_TYPE_HOLD = 2
+BUTTON_TYPE_LONG_HOLD = 3

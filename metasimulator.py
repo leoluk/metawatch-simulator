@@ -73,6 +73,7 @@ class MainFrame(gui_metasimulator.MainFrame, serialcore.SerialMixin):
         # PropertyGrid entry or showing an indicator.
         
         self.parser = protocol_handlers.GUIMetaProtocolParser(self)
+        self.factory = protocol_handlers.GUIMetaProtocolFactory(self)
         
         # The serial class will be accessed from the serialcore.SerialMixin.
         # The initial port is taken from the GUI code, but can be changed at

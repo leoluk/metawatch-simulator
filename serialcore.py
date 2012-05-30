@@ -14,7 +14,7 @@
 
 """This module contains the serial RX/TX thread. Pretty self-explanatory and boring."""
 
-import sys, os
+import sys, os, time
 
 import wx
 import serial
@@ -42,7 +42,7 @@ class SerialMixin(object):
         self.thread = None
         self.alive = threading.Event()
         self.logger = logging.getLogger("serial")
-        #self.write_queue = Queue.Queue()
+        self.write_queue = Queue.Queue()
         
     def StartThread(self):
         """Start the receiver thread"""        
@@ -62,6 +62,8 @@ class SerialMixin(object):
         """Thread that handles the incomming traffic. Does the basic input
            transformation (newlines) and generates an SerialRxEvent"""
         
+        self.serial.setTimeout(0.1)
+        
         while self.alive.isSet():               #loop while alive event is true
             try:
                 text = self.serial.read(1)          #read one, with timout
@@ -72,7 +74,13 @@ class SerialMixin(object):
     
                     event = SerialRxEvent(self.GetId(), text)
                     self.GetEventHandler().AddPendingEvent(event)
+                
+                if not self.write_queue.empty():
+                    self.serial.write(self.write_queue.get_nowait())
+                    
+                #time.sleep(0.01)
+                    
             except:
-                self.logger.exception("Failed to read from serial port")
+                self.logger.exception("Failed to read/write from/to serial port")
                 self.alive.clear()
                 self.thread.stop()
