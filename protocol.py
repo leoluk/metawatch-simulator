@@ -193,9 +193,9 @@ class MetaProtocolParser(BaseProtocolParser):
     def handle_setRTC(self, msgtype, option_bits, payload):
         year = unpack(payload[:2], mode='>h')
         
-        month = payload[4]
+        month = payload[2]
         day = payload[3]
-        week_day = payload[5]
+        week_day = payload[4]
         
         hour = payload[5]
         minute = payload[6]
