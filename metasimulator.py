@@ -31,6 +31,7 @@ import inspect
 import logging
 import datetime
 import time
+import json
 
 import serial
 import wx
@@ -45,11 +46,14 @@ import nval
 import serialcore
 import protocol
 import protocol_handlers
-import  protocol_constants as const
+import protocol_constants as const
 
 logging.basicConfig(stream=sys.stdout,
                     format="%(levelname)s - %(name)s -> %(message)s",
                     level=logging.DEBUG)
+
+
+INI_FILE = 'metasimulator.yml'
 
 
 class MainFrame(gui_metasimulator.MainFrame, serialcore.SerialMixin):
@@ -76,14 +80,6 @@ class MainFrame(gui_metasimulator.MainFrame, serialcore.SerialMixin):
         
         self.parser = protocol_handlers.GUIMetaProtocolParser(self)
         self.factory = protocol_handlers.GUIMetaProtocolFactory(self)
-        
-        # The serial class will be accessed from the serialcore.SerialMixin.
-        # The initial port is taken from the GUI code, but can be changed at
-        # any time using the Setup dialog.
-        
-        self.serial = serial.Serial(self.m_comPort.Value)
-        self.serial.close()
-        self.serial.timeout = 0.5
         
         # Nice colorization for log messages in the main window. There are
         # definitely better ways to do this, like implementing a custom
@@ -128,8 +124,28 @@ class MainFrame(gui_metasimulator.MainFrame, serialcore.SerialMixin):
         self.Bind(serialcore.EVT_SERIALRX, self.OnSerialRX)
         
         logging.info("GUI initialized")
-        
         self.logger = logging.getLogger("main")
+        
+        # The config parser reads configuration values from a settings file.
+        # At the moment, this is only the most recent COM port.
+        
+        try:
+            self.config = json.load(open(INI_FILE))
+        except (IOError, ValueError):
+            self.config = {}
+        
+        last_com_port = self.config.get('LastPort', 'COM1')
+        
+        # The serial class will be accessed from the serialcore.SerialMixin.
+        
+        try:
+            self.serial = serial.Serial(last_com_port)
+        except serial.SerialException:
+            self.serial = serial.Serial()
+        
+        self.serial.close()
+        self.serial.timeout = 0.5
+        self.m_comPort.Value = self.serial.port
         
         # The real time clock is updated by a regular timer event.
         
@@ -151,6 +167,10 @@ class MainFrame(gui_metasimulator.MainFrame, serialcore.SerialMixin):
             if sys.argv[1] == '--debug':
                 self.m_debug.Value = True
                 streamhandler.setLevel(logging.DEBUG)
+                
+    def save_settings(self):
+        self.config['LastPort'] = self.serial.port
+        json.dump(self.config, open(INI_FILE, 'w'), indent=4)
         
     def _reset_watch(self):
         """Resets or initializes the internal GUI representation of the
@@ -233,6 +253,8 @@ class MainFrame(gui_metasimulator.MainFrame, serialcore.SerialMixin):
         if self.serial.isOpen(): 
             self.StopThread()
             self.serial.close()
+            
+        self.save_settings()
             
         self.Destroy()
         

@@ -147,7 +147,7 @@ class MainFrame ( wx.Frame ):
 		self.m_staticText5.Wrap( -1 )
 		fgSizer2.Add( self.m_staticText5, 0, wx.ALIGN_CENTER|wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
-		self.m_comPort = wx.TextCtrl( self, wx.ID_ANY, u"COM8", wx.DefaultPosition, wx.DefaultSize, wx.TE_READONLY )
+		self.m_comPort = wx.TextCtrl( self, wx.ID_ANY, u"<not set>", wx.DefaultPosition, wx.DefaultSize, wx.TE_READONLY )
 		fgSizer2.Add( self.m_comPort, 0, wx.ALL, 5 )
 		
 		self.m_serialSetup = wx.Button( self, wx.ID_ANY, u"Setup...", wx.DefaultPosition, wx.DefaultSize, 0 )
