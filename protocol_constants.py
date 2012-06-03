@@ -129,6 +129,7 @@ BUTTON_LONG_HOLD_TIME = 1000
 # GUI constants
 
 BUTTON_ALPHA = ('A', 'B', 'C', 'D', ' ', 'E', 'F', 'P')
+BUTTON_REAL_IDS = [0, 1, 2, 3, 5, 6]
 
 # Textual representations
 

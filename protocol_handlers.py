@@ -57,6 +57,7 @@ class GUIMetaProtocolParser(MetaProtocolParser):
     def active_buffer(self, value):
         self.window.m_watchMode.Selection = value
         self.refresh_bitmap(value)
+        self.update_button_colors()
         
     @property
     def display_buffer(self):
@@ -234,15 +235,35 @@ class GUIMetaProtocolParser(MetaProtocolParser):
         data.fromstring(chr(cb_data))
             
         self.button_mapping[req_hash] = (cb, data)
+        self.update_button_colors()
         
     def handle_disableButton(self, *args, **kwargs):
             button_config = MetaProtocolParser.handle_disableButton(self, *args, **kwargs)
             
             if button_config in self.button_mapping:
                 self.button_mapping.pop(button_config)
+                self.update_button_colors()
                 self.logger.info("Button mapping %r removed", [button_config])
             else:
                 self.logger.debug("Button mapping %r does not exist", [button_config])
+                
+    def _button_by_name(self, btn_id):
+        """Returns the button object given its protocol ID."""
+        
+        btn_alpha = const.BUTTON_ALPHA[btn_id]
+        control = getattr(self.window, 'm_Side%s' % btn_alpha)        
+
+        return control
+                
+    def update_button_colors(self):
+        # TODO: different colors for different action types
+        
+        for btn_id in const.BUTTON_REAL_IDS:
+            self._button_by_name(btn_id).SetBackgroundColour(None)
+        
+        for mapping in self.button_mapping:
+            if mapping[0] == self.active_buffer:
+                self._button_by_name(mapping[1]).SetBackgroundColour('gray')
                 
     def _reset_mode(self, last=0):
         self.active_buffer = last
