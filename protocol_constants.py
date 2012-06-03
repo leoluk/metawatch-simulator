@@ -119,3 +119,28 @@ BUTTON_TYPE_IMMEDIATE = 0
 BUTTON_TYPE_PRESS = 1
 BUTTON_TYPE_HOLD = 2
 BUTTON_TYPE_LONG_HOLD = 3
+
+# Assumptions
+
+LED_TIMEOUT = 10000
+BUTTON_HOLD_TIME = 200
+BUTTON_LONG_HOLD_TIME = 1000
+
+# GUI constants
+
+BUTTON_ALPHA = ('A', 'B', 'C', 'D', ' ', 'E', 'F', 'P')
+
+# Textual representations
+
+TEXT_DISPLAY_MODE = {
+    0: "Idle",
+    1: "Application",
+    2: "Notification",
+}
+
+TEXT_BUTTON_TYPE = {
+    0: "Immediate",
+    1: "Press and release",
+    2: "Hold and release",
+    3: "Long hold and release",
+}

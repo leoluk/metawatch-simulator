@@ -96,6 +96,9 @@ class MainFrame ( wx.Frame ):
 		self.m_resetWatch = wx.Button( self, wx.ID_ANY, u"Reset watch state", wx.DefaultPosition, wx.DefaultSize, 0 )
 		bSizer10.Add( self.m_resetWatch, 0, wx.ALL|wx.EXPAND, 5 )
 		
+		self.m_blockIdle = wx.CheckBox( self, wx.ID_ANY, u"Block MWM Idle", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer10.Add( self.m_blockIdle, 0, wx.ALL, 5 )
+		
 		
 		bScreenSizer.Add( bSizer10, 0, wx.EXPAND, 5 )
 		
@@ -194,13 +197,9 @@ class MainFrame ( wx.Frame ):
 		
 		# Connect Events
 		self.Bind( wx.EVT_CLOSE, self.MainFrameOnClose )
-		self.m_SideF.Bind( wx.EVT_BUTTON, self.m_OnSideButtonClick )
-		self.m_SideE.Bind( wx.EVT_BUTTON, self.m_OnSideButtonClick )
-		self.m_SideD.Bind( wx.EVT_BUTTON, self.m_OnSideButtonClick )
 		self.m_display.Bind( wx.EVT_PAINT, self.OnDisplayPaint )
-		self.m_SideA.Bind( wx.EVT_BUTTON, self.m_OnSideButtonClick )
-		self.m_SideB.Bind( wx.EVT_BUTTON, self.m_OnSideButtonClick )
-		self.m_SideC.Bind( wx.EVT_BUTTON, self.m_OnSideButtonClick )
+		self.m_SideA.Bind( wx.EVT_LEFT_DOWN, self.OnSideButtonDown )
+		self.m_SideA.Bind( wx.EVT_LEFT_UP, self.OnSideButtonUp )
 		self.m_resetWatch.Bind( wx.EVT_BUTTON, self.m_resetWatchOnButtonClick )
 		self.m_watchMode.Bind( wx.EVT_RADIOBOX, self.m_watchModeOnRadioBox )
 		self.m_manualModeSet.Bind( wx.EVT_CHECKBOX, self.m_manualModeSetOnCheckBox )
@@ -217,16 +216,14 @@ class MainFrame ( wx.Frame ):
 	def MainFrameOnClose( self, event ):
 		event.Skip()
 	
-	def m_OnSideButtonClick( self, event ):
-		event.Skip()
-	
-	
-	
 	def OnDisplayPaint( self, event ):
 		event.Skip()
 	
+	def OnSideButtonDown( self, event ):
+		event.Skip()
 	
-	
+	def OnSideButtonUp( self, event ):
+		event.Skip()
 	
 	def m_resetWatchOnButtonClick( self, event ):
 		event.Skip()

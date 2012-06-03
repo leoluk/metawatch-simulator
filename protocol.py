@@ -53,7 +53,17 @@ class BaseProtocolParser(object):
         if clip:
             message = message[0:-2]
         crc_ = self.crc_engine.checksum(str(message))
-        return bytearray(struct.pack('<H', crc_))        
+        return bytearray(struct.pack('<H', crc_))
+    
+    def _init_option_bits(self, bare=False):
+        """Returns a correctly initialized bitarray."""
+        
+        array = bitarray(endian='little')
+        
+        if not bare:
+            array.fromstring('\x00')
+        
+        return array    
         
     def parse(self, message):
         """Parses one or more watch messages, checks their integrity, splits\
@@ -109,14 +119,6 @@ class MetaProtocolFactory(BaseProtocolParser):
     It shares some processing code with the protocol parser (after all,
     there is not THAT much difference in what they do)."""
     
-    def _init_option_bits(self):
-        """Returns a correctly initialized bitarray."""
-        
-        array = bitarray(endian='little')
-        array.fromstring('\x00')
-        
-        return array
-    
     def _compose_message(self, option_bits=None, payload=None, msgtype=None):
         """Constructs a new message from its different parts,
         ready to dispatch."""
@@ -162,6 +164,15 @@ class MetaProtocolFactory(BaseProtocolParser):
     def send_getDeviceTypeResponse(self, device_type):
         payload = bytearray(device_type)
         return self._compose_message(None, payload)
+    
+    def send_buttonEvent(self, btn_alpha, option_bits=None):
+        if not option_bits:
+            option_bits = self._init_option_bits()
+            
+        payload = self._init_option_bits()
+        payload[const.BUTTON_ALPHA.index(btn_alpha)] = True
+        
+        return self._compose_message(option_bits, payload)
         
         
 class MetaProtocolParser(BaseProtocolParser):
@@ -176,6 +187,8 @@ class MetaProtocolParser(BaseProtocolParser):
     Data should be passed using bytearray's, not binary strings.
     
     """
+    
+    # TODO: return a class or named tuple instead of a simple one
     
     def handle_setRTC(self, msgtype, option_bits, payload):
         year = unpack(payload[:2], mode='>h')
@@ -215,6 +228,15 @@ class MetaProtocolParser(BaseProtocolParser):
         cycles = payload[5]
         
         return action, on_time, off_time, cycles
+    
+    def handle_enableButton(self, msgtype, option_bits, payload):
+        mode, btn_id, btn_type, cb, cb_data = payload
+        
+        if cb != 0x34:
+            raise NotImplementedError("Button callback type other than 0x34 not"
+                                      "supported")
+        
+        return mode, btn_id, btn_type, cb, cb_data
     
     def handle_disableButton(self, msgtype, option_bits, payload):
         mode, index, press_type = payload

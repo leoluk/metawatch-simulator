@@ -74,7 +74,7 @@ class GUIMetaProtocolParser(MetaProtocolParser):
         should be reset here (registers etc.)."""
         
         self.vibrate.clear()
-        self.button_mapping = []
+        self.button_mapping = {}
         
         self.display_buffers = [
             numpy.zeros( (96, 96, 3),'uint8'),  # Idle
@@ -135,7 +135,7 @@ class GUIMetaProtocolParser(MetaProtocolParser):
         if state:
             self.window.m_LEDNotice.Show()
             # Hardcoded, what does a real watch do?
-            wx.CallLater(10000, self.window.m_LEDNotice.Hide)
+            wx.CallLater(const.LED_TIMEOUT, self.window.m_LEDNotice.Hide)
         else:
             self.window.m_LEDNotice.Hide()
             
@@ -177,13 +177,69 @@ class GUIMetaProtocolParser(MetaProtocolParser):
         else:
             self.window.m_vibrateNotice.Hide()
             self.vibrate.clear()
+            
+    def _button_press(self, btn, msecs):
+        if msecs == 0:
+            ptype = const.BUTTON_TYPE_IMMEDIATE
+        elif msecs > const.BUTTON_LONG_HOLD_TIME:
+            ptype = const.BUTTON_TYPE_LONG_HOLD
+        elif msecs > const.BUTTON_HOLD_TIME:
+            ptype = const.BUTTON_TYPE_HOLD
+        else:
+            # No hold-press, IMMEDIATE triggered anyway
+            ptype = 0
+            
+        self._send_button_response(btn, ptype)
+            
+    def _send_button_response(self, btn, ptype):
+        btn_hash = (self.active_buffer,
+                    const.BUTTON_ALPHA.index(btn), ptype)
         
+        if not btn_hash in self.button_mapping:
+            # Button not registered
+            return
+        
+        cb, cb_data = self.button_mapping[btn_hash]
+        
+        assert cb == 0x34
+        
+        self.window.factory.send_buttonEvent(
+            btn_alpha=btn,
+            option_bits=cb_data, 
+        )
+            
+    def _button_hash_repr(self, req_hash):
+        """Helper function which returns a human-readable
+        representation of a (mode, btn_id, btn_type) message."""
+        
+        mode = const.TEXT_DISPLAY_MODE[req_hash[0]]
+        btn_id = const.BUTTON_ALPHA[req_hash[1]]
+        btn_type = const.TEXT_BUTTON_TYPE[req_hash[2]]
+        
+        return ("button {btn_id} for "
+                "{mode} mode ({btn_type})".format(**locals()))
+            
+    def handle_enableButton(self, *args, **kwargs):
+        mode, btn_id, btn_type, cb, cb_data = \
+            MetaProtocolParser.handle_enableButton(self, *args, **kwargs)
+        
+        req_hash = (mode, btn_id, btn_type)
+        
+        if req_hash in self.button_mapping:
+            self.logger.info("Re-registered %s", self._button_hash_repr(req_hash))
+        else:
+            self.logger.info("Registered %s", self._button_hash_repr(req_hash))
+            
+        data = self._init_option_bits(True)
+        data.fromstring(chr(cb_data))
+            
+        self.button_mapping[req_hash] = (cb, data)
         
     def handle_disableButton(self, *args, **kwargs):
             button_config = MetaProtocolParser.handle_disableButton(self, *args, **kwargs)
             
             if button_config in self.button_mapping:
-                self.button_mapping.remove(button_config)
+                self.button_mapping.pop(button_config)
                 self.logger.info("Button mapping %r removed", [button_config])
             else:
                 self.logger.debug("Button mapping %r does not exist", [button_config])
@@ -230,11 +286,15 @@ class GUIMetaProtocolParser(MetaProtocolParser):
             self.refresh_bitmap(mode)
             
     def handle_getDeviceType(self, *args, **kwargs):
+        if self.window.m_blockIdle.Value:
+            self.logger.info("Denied device type request")
+            return
+        
         self.window.factory.send_getDeviceTypeResponse(
             const.DEVICE_TYPE_DIGITAL
         )
-        self.logger.info("Responded to device type query: DEVICE_TYPE_DIGITAL")
         
+        self.logger.info("Responded to device type query: DEVICE_TYPE_DIGITAL")
                       
                       
 class GUIMetaProtocolFactory(MetaProtocolFactory):
@@ -254,6 +314,6 @@ class GUIMetaProtocolFactory(MetaProtocolFactory):
         
         self.window.write_queue.put(message)
         self.logger.debug("Sent data: %s", ' '.join(["%02X" %
-                                  byte for byte in message]))        
+                                  byte for byte in message]))
         
         

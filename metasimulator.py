@@ -30,6 +30,7 @@ import sys, os
 import inspect
 import logging
 import datetime
+import time
 
 import serial
 import wx
@@ -44,6 +45,7 @@ import nval
 import serialcore
 import protocol
 import protocol_handlers
+import  protocol_constants as const
 
 logging.basicConfig(stream=sys.stdout,
                     format="%(levelname)s - %(name)s -> %(message)s",
@@ -133,6 +135,13 @@ class MainFrame(gui_metasimulator.MainFrame, serialcore.SerialMixin):
         self.clock.Start(500)
         self.Bind(wx.EVT_TIMER, self.OnClock)
         
+        for btn in ['B', 'C', 'D', 'E', 'F']:
+            button = getattr(self, 'm_Side'+btn)
+            button.Bind(wx.EVT_LEFT_UP, self.OnSideButtonUp )
+            button.Bind(wx.EVT_LEFT_DOWN, self.OnSideButtonDown)
+            
+        self.btn_time = {}
+        
         self.m_resetWatchOnButtonClick(None)
         self.m_openConnectionOnButtonClick()
         
@@ -198,6 +207,19 @@ class MainFrame(gui_metasimulator.MainFrame, serialcore.SerialMixin):
         self.OnClock()
         
         self.logger.info("Initialized watch to default state")
+        
+    def OnSideButtonDown(self, event):
+        event.Skip()
+        btn_id = event.GetEventObject().Label
+        self.btn_time[btn_id] = time.time()
+        self.parser._button_press(btn_id, 0)
+        
+    def OnSideButtonUp(self, event):
+        event.Skip()
+        btn_id = event.GetEventObject().Label
+        diff = (time.time() - self.btn_time[btn_id]) * 1000
+        self.logger.debug("Button %s press-release, held %f msecs", btn_id, diff)
+        self.parser._button_press(btn_id, msecs=diff)
 
     def m_resetWatchOnButtonClick(self, event):
         self._reset_watch()

@@ -84,3 +84,5 @@ class SerialMixin(object):
                 self.logger.exception("Failed to read/write from/to serial port")
                 self.alive.clear()
                 self.thread.stop()
+                
+                # TODO: restart thread in case of failure
