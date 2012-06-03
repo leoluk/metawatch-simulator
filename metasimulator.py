@@ -49,7 +49,7 @@ import  protocol_constants as const
 
 logging.basicConfig(stream=sys.stdout,
                     format="%(levelname)s - %(name)s -> %(message)s",
-                    level=logging.INFO)
+                    level=logging.DEBUG)
 
 
 class MainFrame(gui_metasimulator.MainFrame, serialcore.SerialMixin):
@@ -108,6 +108,8 @@ class MainFrame(gui_metasimulator.MainFrame, serialcore.SerialMixin):
         streamhandler = logging.StreamHandler(stream=TBStream)
         streamhandler.formatter = logging.Formatter("[%(levelname)s] - %(name)s "
                                                     "-> %(message)s")
+        
+        self.log_window_handler = streamhandler
         logging.root.addHandler(streamhandler)
         
         # Shortcut for NVAL access
@@ -148,7 +150,7 @@ class MainFrame(gui_metasimulator.MainFrame, serialcore.SerialMixin):
         if len(sys.argv) > 1:
             if sys.argv[1] == '--debug':
                 self.m_debug.Value = True
-                logging.root.setLevel(logging.DEBUG)
+                streamhandler.setLevel(logging.DEBUG)
         
     def _reset_watch(self):
         """Resets or initializes the internal GUI representation of the
@@ -283,7 +285,7 @@ class MainFrame(gui_metasimulator.MainFrame, serialcore.SerialMixin):
             self.logger.info("Closed serial connection")
             
     def m_debugOnCheckBox(self, event):
-        logging.root.setLevel(logging.DEBUG if event.Checked() else logging.INFO)
+        self.log_window_handler.setLevel(logging.DEBUG if event.Checked() else logging.INFO)
         
     def m_serialSetupOnButtonClick(self, event=None):
         """Event handler for the serial setup button. Calls the pySerial
