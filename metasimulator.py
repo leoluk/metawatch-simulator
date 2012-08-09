@@ -145,7 +145,7 @@ class MainFrame(gui_metasimulator.MainFrame, serialcore.SerialMixin):
         
         self.serial.close()
         self.serial.timeout = 0.5
-        self.m_comPort.Value = self.serial.port
+        self.m_comPort.Value = self.serial.port or 'None'
         
         # The real time clock is updated by a regular timer event.
         
@@ -161,7 +161,8 @@ class MainFrame(gui_metasimulator.MainFrame, serialcore.SerialMixin):
         self.btn_time = {}
         
         self.m_resetWatchOnButtonClick(None)
-        self.m_openConnectionOnButtonClick()
+        if self.serial.port:
+            self.m_openConnectionOnButtonClick()
         
         if len(sys.argv) > 1:
             if sys.argv[1] == '--debug':
@@ -367,7 +368,7 @@ class MetaSimApp(wx.App):
         wx.lib.colourdb.updateColourDB()
 
         frame_main = MainFrame(None)
-        frame_main.SetBackgroundColour(wx.NullColour)
+        frame_main.SetBackgroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_BACKGROUND))
         self.SetTopWindow(frame_main)
         frame_main.Show()
 
