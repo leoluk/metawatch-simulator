@@ -145,7 +145,7 @@ class MainFrame(gui_metasimulator.MainFrame, serialcore.SerialMixin):
         
         self.serial.close()
         self.serial.timeout = 0.5
-        self.m_comPort.Value = self.serial.port
+        self.m_comPort.Value = self.serial.port or 'None'
         
         # The real time clock is updated by a regular timer event.
         
@@ -161,7 +161,8 @@ class MainFrame(gui_metasimulator.MainFrame, serialcore.SerialMixin):
         self.btn_time = {}
         
         self.m_resetWatchOnButtonClick(None)
-        self.m_openConnectionOnButtonClick()
+        if self.serial.port:
+            self.m_openConnectionOnButtonClick()
         
         if len(sys.argv) > 1:
             if sys.argv[1] == '--debug':
