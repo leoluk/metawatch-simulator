@@ -367,7 +367,7 @@ class MetaSimApp(wx.App):
         wx.lib.colourdb.updateColourDB()
 
         frame_main = MainFrame(None)
-        frame_main.SetBackgroundColour(wx.NullColour)
+        frame_main.SetBackgroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_BACKGROUND))
         self.SetTopWindow(frame_main)
         frame_main.Show()
 
